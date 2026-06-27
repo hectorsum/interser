@@ -15,9 +15,12 @@
   --color-text-light: #7a6a5a;
   --font-sans: 'Montserrat', sans-serif;
   --font-display: 'Raleway', sans-serif;
+  --font-serif: Georgia, serif;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -30,4 +33,14 @@ body {
   color: #2d2d2d;
   background-color: #fafaf8;
   overflow-x: hidden;
+}
+
+@keyframes progress {
+  from {
+    width: 0%
+  }
+
+  to {
+    width: 100%
+  }
 }
