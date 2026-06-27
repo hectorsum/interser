@@ -1,0 +1,5 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="95" stroke="#4a6741" stroke-width="3" fill="none"></circle>
+  <text x="100" y="115" font-family="Raleway, sans-serif" font-size="24" font-weight="500" text-anchor="middle" fill="#4a6741">interser</text>
+  <circle cx="100" cy="85" r="4" fill="#4a6741"></circle>
+</svg>
