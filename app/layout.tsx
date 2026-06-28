@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Montserrat, Raleway } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import './globals.css'
 
 const montserrat = Montserrat({
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
