@@ -1,88 +1,335 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
-const mockPayments = [
-  { id: 1, patient: 'María Pérez', concept: 'TCC - Sesión', date: '2025-06-27', method: 'Transferencia', amount: 85, status: 'Pagado' },
-  { id: 2, patient: 'Carlos Ruiz', concept: 'DBT - Paquete 4 sesiones', date: '2025-06-25', method: 'Yape', amount: 280, status: 'Pagado' },
-  { id: 3, patient: 'Ana López', concept: 'Evaluación integral', date: '2025-06-28', method: 'Efectivo', amount: 400, status: 'Pendiente' },
-  { id: 4, patient: 'Juan García', concept: 'DBT - Sesión', date: '2025-06-28', method: 'Transferencia', amount: 85, status: 'Pendiente' },
-  { id: 5, patient: 'Sofia M.', concept: 'TCC - Sesión', date: '2025-06-20', method: 'Yape', amount: 85, status: 'Vencido' },
-]
+type PaymentStatus = 'PAGADO' | 'PENDIENTE'
+type Method = 'Efectivo' | 'Transferencia' | 'Tarjeta'
 
-const statusColors: Record<string, { bg: string; text: string }> = {
-  Pagado: { bg: '#d4edda', text: '#155724' },
-  Pendiente: { bg: '#fff3cd', text: '#856404' },
-  Vencido: { bg: '#f8d7da', text: '#721c24' },
+interface Payment {
+  id: number
+  patient: string
+  concept: string
+  amount: number
+  method: Method
+  status: PaymentStatus
+  receipt: boolean
+  date: string  // YYYY-MM-DD
 }
 
+const mockPayments: Payment[] = [
+  { id: 1,  patient: 'Roberto Jiménez', concept: 'Sesión terapia',       amount: 120, method: 'Efectivo',      status: 'PENDIENTE', receipt: false, date: '2026-06-10' },
+  { id: 2,  patient: 'Ana Rodríguez',   concept: '—',                    amount: 120, method: 'Transferencia', status: 'PENDIENTE', receipt: true,  date: '2026-06-10' },
+  { id: 3,  patient: 'Sofía Herrera',   concept: 'Sesión TCC',           amount: 120, method: 'Efectivo',      status: 'PAGADO',    receipt: true,  date: '2026-06-03' },
+  { id: 4,  patient: 'Isabel Moreno',   concept: 'Eval. seguimiento',    amount: 220, method: 'Tarjeta',       status: 'PAGADO',    receipt: true,  date: '2026-05-21' },
+  { id: 5,  patient: 'Ana Rodríguez',   concept: 'Sesión DBT',           amount: 120, method: 'Transferencia', status: 'PAGADO',    receipt: true,  date: '2026-05-14' },
+  { id: 6,  patient: 'María García',    concept: 'Sesión TCC',           amount: 120, method: 'Transferencia', status: 'PAGADO',    receipt: true,  date: '2026-05-06' },
+  { id: 7,  patient: 'Pedro Torres',    concept: 'Apoyo hábitos',        amount: 100, method: 'Efectivo',      status: 'PENDIENTE', receipt: false, date: '2026-04-15' },
+  { id: 8,  patient: 'Carlos Martínez', concept: 'Sesión terapia',       amount: 120, method: 'Transferencia', status: 'PAGADO',    receipt: true,  date: '2026-04-08' },
+  { id: 9,  patient: 'Sofía Herrera',   concept: 'Sesión TCC',           amount: 120, method: 'Efectivo',      status: 'PAGADO',    receipt: true,  date: '2026-04-02' },
+  { id: 10, patient: 'Roberto Jiménez', concept: 'Evaluación autismo',   amount: 200, method: 'Efectivo',      status: 'PENDIENTE', receipt: false, date: '2026-03-25' },
+  { id: 11, patient: 'Juan López',      concept: 'Sesión terapia',       amount: 120, method: 'Transferencia', status: 'PAGADO',    receipt: true,  date: '2026-03-11' },
+  { id: 12, patient: 'María García',    concept: 'Sesión TCC',           amount: 120, method: 'Efectivo',      status: 'PAGADO',    receipt: true,  date: '2026-02-19' },
+]
+
+const statusStyle: Record<PaymentStatus, { bg: string; color: string }> = {
+  PAGADO:    { bg: 'rgba(39,174,96,0.12)',  color: '#1a7a45' },
+  PENDIENTE: { bg: 'rgba(230,165,0,0.15)',  color: '#7a5500' },
+}
+
+const MONTH_NAMES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+]
+
+const patients = [...new Set(mockPayments.map((p) => p.patient))].sort()
+
+function formatDate(d: string) {
+  const [y, m, day] = d.split('-')
+  return `${day}/${m}/${y}`
+}
+
+type StatusFilter  = 'Todos' | 'PAGADO' | 'PENDIENTE'
+type ReceiptFilter = 'Todos' | 'con' | 'sin'
+
+const CheckIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a45" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+)
+
+const XIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0392b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+)
+
 export default function PagosPage() {
-  const totalIngresos = mockPayments.filter((p) => p.status === 'Pagado').reduce((a, p) => a + p.amount, 0)
-  const totalPendiente = mockPayments.filter((p) => p.status !== 'Pagado').reduce((a, p) => a + p.amount, 0)
+  const [statusFilter,  setStatusFilter]  = useState<StatusFilter>('Todos')
+  const [patientFilter, setPatientFilter] = useState('all')
+  const [receiptFilter, setReceiptFilter] = useState<ReceiptFilter>('Todos')
+  const [periodFilter,  setPeriodFilter]  = useState('current-month')
+
+  const now          = new Date()
+  const currentYear  = now.getUTCFullYear()
+  const currentMonth = now.getUTCMonth() + 1
+
+  const currentMonthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`
+
+  // Build dropdown options
+  const periodOptions = useMemo(() => {
+    const opts: { value: string; label: string }[] = [
+      { value: 'current-month', label: `Mes actual (${MONTH_NAMES[currentMonth - 1]} ${currentYear})` },
+      { value: `year-${currentYear}`, label: `${currentYear} completo` },
+      { value: `year-${currentYear - 1}`, label: `${currentYear - 1} completo` },
+    ]
+    // months of current year up to now, descending
+    for (let m = currentMonth; m >= 1; m--) {
+      const key = `${currentYear}-${String(m).padStart(2, '0')}`
+      opts.push({ value: key, label: `${MONTH_NAMES[m - 1]} ${currentYear}` })
+    }
+    // months of last year, descending
+    for (let m = 12; m >= 1; m--) {
+      const key = `${currentYear - 1}-${String(m).padStart(2, '0')}`
+      opts.push({ value: key, label: `${MONTH_NAMES[m - 1]} ${currentYear - 1}` })
+    }
+    return opts
+  }, [currentYear, currentMonth])
+
+  const date = now.toLocaleDateString('es-PE', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+
+  const filtered = useMemo(() => {
+    return mockPayments.filter((p) => {
+      const monthKey = p.date.slice(0, 7)          // YYYY-MM
+      const yearKey  = p.date.slice(0, 4)          // YYYY
+
+      const matchesPeriod =
+        periodFilter === 'current-month'             ? monthKey === currentMonthKey :
+        periodFilter.startsWith('year-')             ? yearKey  === periodFilter.replace('year-', '') :
+                                                       monthKey === periodFilter
+
+      const matchesStatus  = statusFilter  === 'Todos' || p.status === statusFilter
+      const matchesPatient = patientFilter === 'all'   || p.patient === patientFilter
+      const matchesReceipt =
+        receiptFilter === 'Todos' ? true :
+        receiptFilter === 'con'   ? p.receipt :
+                                    !p.receipt
+
+      return matchesPeriod && matchesStatus && matchesPatient && matchesReceipt
+    })
+  }, [periodFilter, statusFilter, patientFilter, receiptFilter, currentMonthKey])
+
+  const totalPagado   = filtered.filter((p) => p.status === 'PAGADO').reduce((acc, p) => acc + p.amount, 0)
+  const totalPendiente = filtered.filter((p) => p.status === 'PENDIENTE').reduce((acc, p) => acc + p.amount, 0)
+
+  const filterBtnStyle = (active: boolean): React.CSSProperties => ({
+    fontFamily: 'var(--font-montserrat)',
+    background: active ? '#c47a3a' : 'white',
+    color: active ? 'white' : '#5d5d5d',
+    border: '1px solid #d0c9c2',
+    fontSize: '0.85rem',
+    fontWeight: 600,
+    padding: '0.45rem 1rem',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.35rem',
+    whiteSpace: 'nowrap' as const,
+  })
+
+  const selectStyle: React.CSSProperties = {
+    border: '1px solid #d0c9c2',
+    background: 'white',
+    fontFamily: 'var(--font-montserrat)',
+    color: '#2d2d2d',
+    fontSize: '0.85rem',
+    padding: '0.45rem 2rem 0.45rem 0.75rem',
+    cursor: 'pointer',
+    outline: 'none',
+  }
 
   return (
-    <div className="px-10 py-8">
-      <div className="flex justify-between items-center mb-8 pb-5" style={{ borderBottom: '1px solid #e0d9d3' }}>
+    <div className="px-8 py-8">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-8 pb-5" style={{ borderBottom: '1px solid #e0d9d3' }}>
         <h1 className="text-[1.75rem] font-semibold" style={{ fontFamily: 'var(--font-raleway)', color: '#2d3a28' }}>
           Gestión de Pagos
         </h1>
-        <button className="px-6 py-2.5 text-white text-sm font-bold uppercase tracking-wider"
-          style={{ background: '#c47a3a', fontFamily: 'var(--font-montserrat)', border: 'none', cursor: 'pointer' }}>
-          + Registrar pago
+        <span className="text-[0.82rem] capitalize mt-1" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+          {date}
+        </span>
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        {/* Status filter */}
+        <div className="flex gap-0">
+          {(['Todos', 'PAGADO', 'PENDIENTE'] as StatusFilter[]).map((f, i) => {
+            const labels: Record<StatusFilter, string> = { Todos: 'Todos', PAGADO: '✓ Pagado', PENDIENTE: '⏳ Pendiente' }
+            return (
+              <button
+                key={f}
+                onClick={() => setStatusFilter(f)}
+                style={{ ...filterBtnStyle(statusFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
+              >
+                {labels[f]}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Period dropdown */}
+        <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)} style={selectStyle}>
+          {periodOptions.slice(0, 3).map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+          <option disabled>──────────────</option>
+          {periodOptions.slice(3, 3 + currentMonth).map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+          <option disabled>──────────────</option>
+          {periodOptions.slice(3 + currentMonth).map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+
+        {/* Patient dropdown */}
+        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={selectStyle}>
+          <option value="all">Todos los pacientes</option>
+          {patients.map((p) => <option key={p} value={p}>{p}</option>)}
+        </select>
+
+        {/* Receipt filter */}
+        <div className="flex gap-0">
+          {(['Todos', 'con', 'sin'] as ReceiptFilter[]).map((f, i) => {
+            const labels: Record<ReceiptFilter, string> = { Todos: 'Todos', con: '📋 Con recibo', sin: 'Sin recibo' }
+            return (
+              <button
+                key={f}
+                onClick={() => setReceiptFilter(f)}
+                style={{ ...filterBtnStyle(receiptFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
+              >
+                {labels[f]}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex-1" />
+
+        <button
+          className="px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
+          style={{ background: '#c47a3a', fontFamily: 'var(--font-montserrat)', border: 'none', cursor: 'pointer' }}
+        >
+          + Agregar Pago
         </button>
       </div>
 
-      {/* KPI summary */}
-      <div className="grid grid-cols-3 gap-5 mb-8">
-        {[
-          { label: 'Ingresos cobrados', value: `S/ ${totalIngresos}`, color: '#2d3a28' },
-          { label: 'Pendiente de cobro', value: `S/ ${totalPendiente}`, color: '#c47a3a' },
-          { label: 'Total transacciones', value: mockPayments.length.toString(), color: '#2d3a28' },
-        ].map((k) => (
-          <div key={k.label} className="p-6 bg-white shadow-sm">
-            <p className="text-[0.71rem] font-bold uppercase tracking-widest mb-3" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>{k.label}</p>
-            <p className="text-[1.85rem] font-bold leading-none" style={{ color: k.color, fontFamily: 'var(--font-raleway)' }}>{k.value}</p>
-          </div>
-        ))}
-      </div>
-
       {/* Table */}
-      <div className="bg-white shadow-sm overflow-x-auto">
+      <div className="bg-white" style={{ border: '1px solid #e0d9d3' }}>
         <table className="w-full border-collapse">
           <thead>
-            <tr style={{ background: '#f5f3f0' }}>
-              {['Paciente', 'Concepto', 'Fecha', 'Método', 'Monto', 'Estado', 'Acción'].map((h) => (
-                <th key={h} className="px-4 py-3 text-left text-[0.75rem] font-bold uppercase tracking-wider whitespace-nowrap"
-                  style={{ color: '#2d3a28', borderBottom: '2px solid #e0d9d3', fontFamily: 'var(--font-montserrat)' }}>{h}</th>
+            <tr style={{ borderBottom: '1px solid #e0d9d3' }}>
+              {['Paciente', 'Concepto', 'Monto', 'Método', 'Estado', 'Recibo', 'Fecha', 'Acciones'].map((h) => (
+                <th
+                  key={h}
+                  className="px-5 py-3 text-left text-[0.72rem] font-bold uppercase tracking-wider"
+                  style={{ color: '#2d3a28', fontFamily: 'var(--font-montserrat)' }}
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {mockPayments.map((p) => (
-              <tr key={p.id} style={{ borderBottom: '1px solid #f0ede9' }} className="hover:bg-[#fafaf8] transition-colors">
-                <td className="px-4 py-3 text-sm font-semibold" style={{ color: '#2d2d2d', fontFamily: 'var(--font-montserrat)' }}>{p.patient}</td>
-                <td className="px-4 py-3 text-sm" style={{ color: '#5d5d5d', fontFamily: 'var(--font-montserrat)' }}>{p.concept}</td>
-                <td className="px-4 py-3 text-sm" style={{ color: '#5d5d5d', fontFamily: 'var(--font-montserrat)' }}>{p.date}</td>
-                <td className="px-4 py-3 text-sm" style={{ color: '#5d5d5d', fontFamily: 'var(--font-montserrat)' }}>{p.method}</td>
-                <td className="px-4 py-3 text-sm font-bold" style={{ color: '#2d3a28', fontFamily: 'var(--font-montserrat)' }}>S/ {p.amount}</td>
-                <td className="px-4 py-3">
-                  <span className="text-[0.7rem] font-bold uppercase tracking-wider px-3 py-1"
-                    style={{ background: statusColors[p.status].bg, color: statusColors[p.status].text, fontFamily: 'var(--font-montserrat)' }}>
-                    {p.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  {p.status !== 'Pagado' && (
-                    <button className="text-xs font-bold px-3 py-1.5 text-white"
-                      style={{ background: '#2d3a28', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-montserrat)' }}>
-                      Marcar pagado
-                    </button>
-                  )}
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-5 py-10 text-center text-sm" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+                  No se encontraron pagos.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((p) => (
+                <tr
+                  key={p.id}
+                  className="transition-colors hover:bg-[#fafaf8]"
+                  style={{ borderBottom: '1px solid #f0ede9' }}
+                >
+                  <td className="px-5 py-4 text-sm font-semibold" style={{ color: '#2d2d2d', fontFamily: 'var(--font-montserrat)' }}>
+                    {p.patient}
+                  </td>
+                  <td className="px-5 py-4 text-sm" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+                    {p.concept}
+                  </td>
+                  <td className="px-5 py-4 text-sm font-bold" style={{ color: '#2d2d2d', fontFamily: 'var(--font-montserrat)' }}>
+                    S/ {p.amount.toFixed(2)}
+                  </td>
+                  <td className="px-5 py-4 text-sm" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+                    {p.method}
+                  </td>
+                  <td className="px-5 py-4">
+                    <span
+                      className="text-[0.7rem] font-bold uppercase tracking-wider px-3 py-1"
+                      style={{
+                        background: statusStyle[p.status].bg,
+                        color: statusStyle[p.status].color,
+                        fontFamily: 'var(--font-montserrat)',
+                      }}
+                    >
+                      {p.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    {p.receipt ? <CheckIcon /> : <XIcon />}
+                  </td>
+                  <td className="px-5 py-4 text-sm" style={{ color: '#5d5d5d', fontFamily: 'var(--font-montserrat)' }}>
+                    {formatDate(p.date)}
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex gap-2">
+                      <button
+                        className="text-xs font-bold px-4 py-1.5 text-white transition-opacity hover:opacity-80"
+                        style={{ background: '#2d3a28', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-montserrat)' }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="text-xs font-bold px-4 py-1.5 text-white transition-opacity hover:opacity-80"
+                        style={{ background: '#c0392b', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-montserrat)' }}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
+
+        {/* Totals footer */}
+        <div
+          className="flex justify-end items-stretch gap-0 px-6 py-5"
+          style={{ borderTop: '1px solid #e0d9d3' }}
+        >
+          <div className="text-right pr-8" style={{ borderRight: '1px solid #e0d9d3' }}>
+            <p className="text-[0.68rem] font-bold uppercase tracking-widest mb-1" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+              Total Pagado
+            </p>
+            <p className="text-[1.4rem] font-bold leading-none" style={{ color: '#2d2d2d', fontFamily: 'var(--font-raleway)' }}>
+              S/ {totalPagado.toFixed(2)}
+            </p>
+          </div>
+          <div className="text-right pl-8">
+            <p className="text-[0.68rem] font-bold uppercase tracking-widest mb-1" style={{ color: '#9a8a7a', fontFamily: 'var(--font-montserrat)' }}>
+              Total Pendiente
+            </p>
+            <p className="text-[1.4rem] font-bold leading-none" style={{ color: '#c0392b', fontFamily: 'var(--font-raleway)' }}>
+              S/ {totalPendiente.toFixed(2)}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
