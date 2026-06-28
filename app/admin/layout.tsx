@@ -103,6 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.id}
                 href={item.href}
+                onClick={() => setSidebarOpen(false)}
                 className="flex items-center gap-3 px-6 py-[0.85rem] text-sm font-medium transition-all duration-200"
                 style={{
                   color: isActive ? '#c47a3a' : 'rgba(255,255,255,0.55)',
@@ -147,7 +148,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="w-5 h-0.5 block bg-white" />
             <span className="w-5 h-0.5 block bg-white" />
           </button>
-          <Image src="/assets/logo-main.png" alt="Interser" width={28} height={28} className="h-7 w-auto" />
+          <Image
+            src="/assets/logo-main.svg"
+            alt="Interser"
+            width={100}
+            height={100}
+            style={{ width: '130px', height: 'auto' }}
+            className="object-contain object-left"
+            priority
+          />
         </div>
         {children}
       </main>

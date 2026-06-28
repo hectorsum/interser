@@ -55,7 +55,7 @@ export default function PacientesPage() {
       </div>
 
       {/* Toolbar: filters + search + add */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
         {/* Filter buttons */}
         <div className="flex gap-0">
           {filterBtns.map((f, i) => (
@@ -78,7 +78,7 @@ export default function PacientesPage() {
         </div>
 
         {/* Spacer */}
-        <div className="flex-1" />
+        <div className="hidden sm:flex flex-1" />
 
         {/* Search */}
         <input
@@ -86,7 +86,7 @@ export default function PacientesPage() {
           placeholder="Buscar nombre o DNI..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 text-sm outline-none w-56"
+          className="px-4 py-2 text-sm outline-none w-full sm:w-56"
           style={{
             border: '1px solid #d0c9c2',
             background: 'white',
@@ -99,7 +99,7 @@ export default function PacientesPage() {
 
         {/* Add button */}
         <button
-          className="px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
+          className="w-full sm:w-auto px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
           style={{ background: '#c47a3a', fontFamily: 'var(--font-montserrat)', border: 'none', cursor: 'pointer' }}
         >
           + Agregar Paciente
@@ -107,8 +107,8 @@ export default function PacientesPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white" style={{ border: '1px solid #e0d9d3' }}>
-        <table className="w-full border-collapse">
+      <div className="bg-white overflow-x-auto" style={{ border: '1px solid #e0d9d3' }}>
+        <table className="w-full border-collapse min-w-[600px]">
           <thead>
             <tr style={{ borderBottom: '1px solid #e0d9d3' }}>
               {['Nombre', 'DNI', 'Teléfono', 'Servicio', 'Estado', 'Acciones'].map((h) => (

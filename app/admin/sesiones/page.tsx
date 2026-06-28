@@ -124,25 +124,25 @@ export default function SesionesPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 mb-8">
-        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={selectStyle}>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-8">
+        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
           <option value="all">Todos los pacientes</option>
           {patients.map((p) => (
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
 
-        <select value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)} style={selectStyle}>
+        <select value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
           <option value="all">Todos los meses</option>
           {monthOptions.map((m) => (
             <option key={m.value} value={m.value}>{m.label}</option>
           ))}
         </select>
 
-        <div className="flex-1" />
+        <div className="hidden sm:flex flex-1" />
 
         <button
-          className="px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
+          className="w-full sm:w-auto px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
           style={{ background: '#c47a3a', fontFamily: 'var(--font-montserrat)', border: 'none', cursor: 'pointer' }}
         >
           + Agregar Sesión
@@ -178,8 +178,8 @@ export default function SesionesPage() {
                 </div>
 
                 {/* Table */}
-                <div className="bg-white" style={{ border: '1px solid #e0d9d3' }}>
-                  <table className="w-full border-collapse">
+                <div className="bg-white overflow-x-auto" style={{ border: '1px solid #e0d9d3' }}>
+                  <table className="w-full border-collapse min-w-[600px]">
                     <thead>
                       <tr style={{ borderBottom: '1px solid #e0d9d3' }}>
                         {['Fecha', 'Hora', 'Paciente', 'Tipo', 'Notas', 'Acciones'].map((h) => (

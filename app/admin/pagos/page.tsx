@@ -162,25 +162,45 @@ export default function PagosPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        {/* Status filter */}
-        <div className="flex gap-0">
-          {(['Todos', 'PAGADO', 'PENDIENTE'] as StatusFilter[]).map((f, i) => {
-            const labels: Record<StatusFilter, string> = { Todos: 'Todos', PAGADO: '✓ Pagado', PENDIENTE: '⏳ Pendiente' }
-            return (
-              <button
-                key={f}
-                onClick={() => setStatusFilter(f)}
-                style={{ ...filterBtnStyle(statusFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
-              >
-                {labels[f]}
-              </button>
-            )
-          })}
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 mb-6">
+
+        {/* Mobile: both button groups on one scrollable row */}
+        <div className="flex overflow-x-auto gap-3 pb-0.5 sm:contents">
+          {/* Status filter */}
+          <div className="flex gap-0 shrink-0">
+            {(['Todos', 'PAGADO', 'PENDIENTE'] as StatusFilter[]).map((f, i) => {
+              const labels: Record<StatusFilter, string> = { Todos: 'Todos', PAGADO: '✓ Pagado', PENDIENTE: '⏳ Pendiente' }
+              return (
+                <button
+                  key={f}
+                  onClick={() => setStatusFilter(f)}
+                  style={{ ...filterBtnStyle(statusFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
+                >
+                  {labels[f]}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Receipt filter */}
+          <div className="flex gap-0 shrink-0">
+            {(['Todos', 'con', 'sin'] as ReceiptFilter[]).map((f, i) => {
+              const labels: Record<ReceiptFilter, string> = { Todos: 'Todos', con: '📋 Con recibo', sin: 'Sin recibo' }
+              return (
+                <button
+                  key={f}
+                  onClick={() => setReceiptFilter(f)}
+                  style={{ ...filterBtnStyle(receiptFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
+                >
+                  {labels[f]}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Period dropdown */}
-        <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)} style={selectStyle}>
+        <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
           {periodOptions.slice(0, 3).map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
@@ -195,31 +215,15 @@ export default function PagosPage() {
         </select>
 
         {/* Patient dropdown */}
-        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={selectStyle}>
+        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
           <option value="all">Todos los pacientes</option>
           {patients.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
 
-        {/* Receipt filter */}
-        <div className="flex gap-0">
-          {(['Todos', 'con', 'sin'] as ReceiptFilter[]).map((f, i) => {
-            const labels: Record<ReceiptFilter, string> = { Todos: 'Todos', con: '📋 Con recibo', sin: 'Sin recibo' }
-            return (
-              <button
-                key={f}
-                onClick={() => setReceiptFilter(f)}
-                style={{ ...filterBtnStyle(receiptFilter === f), borderLeft: i > 0 ? 'none' : '1px solid #d0c9c2' }}
-              >
-                {labels[f]}
-              </button>
-            )
-          })}
-        </div>
-
-        <div className="flex-1" />
+        <div className="hidden sm:flex flex-1" />
 
         <button
-          className="px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
+          className="w-full sm:w-auto px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"
           style={{ background: '#c47a3a', fontFamily: 'var(--font-montserrat)', border: 'none', cursor: 'pointer' }}
         >
           + Agregar Pago
@@ -227,8 +231,8 @@ export default function PagosPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white" style={{ border: '1px solid #e0d9d3' }}>
-        <table className="w-full border-collapse">
+      <div className="bg-white overflow-x-auto" style={{ border: '1px solid #e0d9d3' }}>
+        <table className="w-full border-collapse min-w-[700px]">
           <thead>
             <tr style={{ borderBottom: '1px solid #e0d9d3' }}>
               {['Paciente', 'Concepto', 'Monto', 'Método', 'Estado', 'Recibo', 'Fecha', 'Acciones'].map((h) => (
