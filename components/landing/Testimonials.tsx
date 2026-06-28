@@ -99,7 +99,7 @@ export default function Testimonials() {
   return (
     <section
       id="testimonials"
-      className="relative w-full py-16 md:py-20 bg-[#f5f0eb] overflow-hidden"
+      className="relative w-full py-14 px-4 md:py-20 md:px-0 bg-[#f5f0eb] overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -107,7 +107,7 @@ export default function Testimonials() {
         style={{
           textAlign: 'center',
           fontFamily: 'var(--font-raleway)',
-          fontSize: '2.5rem',
+          fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
           color: '#2d2d2d',
           marginBottom: '3rem',
           position: 'relative',
@@ -173,7 +173,7 @@ export default function Testimonials() {
           </div>
           <p
             style={{
-              fontSize: '1.4rem',
+              fontSize: 'clamp(1.1rem, 3vw, 1.4rem)',
               lineHeight: 1.75,
               color: '#2d2018',
               fontFamily: 'var(--font-raleway)',

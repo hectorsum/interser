@@ -22,7 +22,7 @@ export default function Approach() {
   return (
     <section
       id="approach"
-      className="relative overflow-hidden py-24 px-8"
+      className="relative overflow-hidden py-16 px-6 md:py-24 md:px-8"
       style={{ background: '#2d3a28' }}
     >
       {/* Decorative assets */}
@@ -53,7 +53,7 @@ export default function Approach() {
             Cómo trabajamos
           </p>
           <h2
-            className="text-[3rem] leading-[1.15] text-white mb-4"
+            className="text-[2rem] md:text-[3rem] leading-[1.15] text-white mb-4"
             style={{ fontFamily: 'var(--font-raleway)', fontWeight: 500 }}
           >
             Nuestro Enfoque
@@ -68,7 +68,7 @@ export default function Approach() {
         </div>
 
         {/* Pillar cards */}
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {pillars.map((p) => (
             <div
               key={p.num}

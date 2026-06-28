@@ -97,12 +97,12 @@ export default function Services() {
   const [tab, setTab] = useState<'eval' | 'acomp'>('eval')
 
   return (
-    <section id="services" className="py-20 px-12" style={{ background: '#fafaf8' }}>
+    <section id="services" className="py-16 px-4 md:py-20 md:px-12" style={{ background: '#fafaf8' }}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-10">
           <h2
-            className="text-[2.5rem] mb-2"
+            className="text-[2rem] md:text-[2.5rem] mb-2"
             style={{ fontFamily: 'var(--font-raleway)', color: '#2d2d2d', fontWeight: 500 }}
           >
             Nuestros Servicios
@@ -113,7 +113,7 @@ export default function Services() {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex gap-2 mb-10">
+        <div className="flex flex-col sm:flex-row gap-2 mb-10">
           {(['eval', 'acomp'] as const).map((t) => (
             <button
               key={t}
@@ -142,7 +142,7 @@ export default function Services() {
             >
               Evaluaciones desde los 13 años
             </div>
-            <div className="grid grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8">
               {evaluaciones.map((s, i) => <ServiceCard key={i} {...s} />)}
             </div>
             <a
@@ -163,12 +163,12 @@ export default function Services() {
         {/* Acompañamiento panel */}
         {tab === 'acomp' && (
           <div>
-            <div className="grid grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6">
               {acompanamiento.map((s, i) => <ServiceCard key={i} {...s} />)}
             </div>
             {/* Package highlight */}
             <div
-              className="flex items-center justify-between px-6 py-4 mb-8"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 md:px-6 py-4 mb-8"
               style={{ background: 'rgba(196,122,58,0.08)', border: '1px solid rgba(196,122,58,0.2)' }}
             >
               <div className="flex items-center gap-4">

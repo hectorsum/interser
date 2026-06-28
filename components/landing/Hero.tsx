@@ -4,19 +4,11 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section style={{ display: 'flex', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <section className="flex flex-col md:flex-row min-h-screen relative overflow-hidden">
       {/* Left: dark green text column */}
       <div
-        style={{
-          width: '52%',
-          background: '#2d3a28',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '8rem 4rem 4rem 6rem',
-          position: 'relative',
-          zIndex: 2,
-          flexShrink: 0,
-        }}
+        className="w-full md:w-[52%] flex items-center pt-28 pb-12 px-6 md:pt-32 md:pb-16 md:pl-24 md:pr-16 relative z-[2] shrink-0"
+        style={{ background: '#2d3a28' }}
       >
         <Image
           src="/assets/r12.png"
@@ -65,7 +57,7 @@ export default function Hero() {
           {/* Headline */}
           <h1
             style={{
-              fontSize: '4rem',
+              fontSize: 'clamp(2.4rem, 5vw, 4rem)',
               lineHeight: 1.1,
               color: 'white',
               fontFamily: 'var(--font-raleway)',
@@ -147,18 +139,10 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Right: image with organic shape */}
+      {/* Right: image with organic shape — hidden on mobile */}
       <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '6rem 2rem 1rem 1rem',
-          background: '#2d3a28',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
+        className="hidden md:flex flex-1 items-center justify-center relative overflow-hidden"
+        style={{ padding: '6rem 2rem 1rem 1rem', background: '#2d3a28' }}
       >
         <div style={{ position: 'relative', width: '100%', maxWidth: '520px', height: '680px' }}>
           {/* Photo clipped to organic blob */}
