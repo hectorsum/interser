@@ -56,9 +56,13 @@ export default function LoginPage() {
       />
 
       {/* Decorative leaves */}
-      <Image src="/assets/r15.png" alt="" width={260} height={260}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/r15.png" alt="" aria-hidden="true"
+        style={{ width: '260px', height: 'auto' }}
         className="absolute bottom-[-40px] right-[-40px] opacity-[0.12] brightness-[10] pointer-events-none" />
-      <Image src="/assets/r12.png" alt="" width={200} height={200}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/assets/r12.png" alt="" aria-hidden="true"
+        style={{ width: '200px', height: 'auto' }}
         className="absolute top-[-30px] left-[-30px] opacity-[0.08] brightness-[10] rotate-180 pointer-events-none" />
 
       {/* Card */}
@@ -73,7 +77,8 @@ export default function LoginPage() {
             alt="Interser"
             width={100}
             height={100}
-            className="w-auto object-contain object-left"
+            style={{ width: '100px', height: 'auto' }}
+            className="object-contain object-left"
             priority
           />
         </div>
