@@ -24,9 +24,7 @@ export default function About() {
 
         {/* Image side */}
         <div className="relative h-[520px]">
-          <Image src="/assets/svc-trauma.jpg" alt="" width={500} height={500}
-            className="absolute top-[-30px] left-0 pointer-events-none"
-            style={{ width: '95%', height: 'auto', zIndex: 0 }} />
+          <Image src="/assets/svc-trauma.jpg" alt="" width={500} height={500} className="absolute top-[-30px] left-0 pointer-events-none" style={{ width: '95%', height: 'auto', zIndex: 0, borderRadius: '45% 55% 40% 60% / 55% 45% 60% 40%' }} />
           <Image src="/assets/r19-circle.png" alt="" width={200} height={200}
             className="absolute top-[-60px] right-[-50px] opacity-60 pointer-events-none"
             style={{ width: '200px', height: 'auto', zIndex: 1 }} />
@@ -60,12 +58,12 @@ export default function About() {
 
           {/* Quote overlay card */}
           <div
-            className="absolute bg-white rounded-xl p-5 shadow-xl"
-            style={{ bottom: '150px', left: '-20px', zIndex: 3, maxWidth: '220px' }}
+            className="absolute bg-white rounded-xl px-7 py-6 shadow-xl"
+            style={{ bottom: '150px', left: '-20px', zIndex: 3, maxWidth: '300px' }}
           >
             <div
-              className="text-[2rem] leading-none mb-2"
-              style={{ color: '#c47a3a', fontFamily: 'Georgia, serif' }}
+              className="text-[2rem] leading-none mb-0 font-serif"
+              style={{ color: '#c47a3a' }}
             >
               "
             </div>

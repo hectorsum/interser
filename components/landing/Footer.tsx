@@ -161,8 +161,10 @@ export default function Footer() {
               margin: 0,
             }}
           >
-            © 2025 Interser. Todos los derechos reservados.&nbsp;&nbsp;|&nbsp;&nbsp;Developed by{' '}
-            <span style={{ color: '#c47a3a' }}>Hector Herrera</span>
+            © {new Date().getFullYear()} Interser. Todos los derechos reservados.&nbsp;&nbsp;|&nbsp;&nbsp;Developed by{' '}
+            <Link href="https://hectorsum.vercel.app/" target="_blank" rel="noopener noreferrer" className='text-[#c47a3a]'>
+              Hector Herrera
+            </Link>
           </p>
           <Link
             href="/login"

@@ -30,7 +30,7 @@ export default function Navbar() {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between transition-all duration-300"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between transition-all duration-300 border-0"
         style={{
           padding: scrolled ? '0.7rem 2rem' : '1.2rem 2rem',
           background: scrolled ? 'rgba(255,255,255,0.92)' : 'transparent',
@@ -95,7 +95,7 @@ export default function Navbar() {
         </button>
 
         <div
-          className="absolute bottom-0 left-0 h-0.5 transition-all duration-150"
+          className="absolute bottom-0 left-0 h-0.5"
           style={{ width: `${progress}%`, background: '#c47a3a' }}
         />
       </header>

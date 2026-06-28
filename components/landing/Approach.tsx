@@ -32,7 +32,7 @@ export default function Approach() {
         width={320}
         height={320}
         className="absolute right-[-60px] bottom-[-40px] opacity-10 pointer-events-none"
-        style={{ width: '320px', height: 'auto' }}
+      // style={{ width: '320px', height: 'auto' }}
       />
       <Image
         src="/assets/r12.png"
@@ -72,11 +72,7 @@ export default function Approach() {
           {pillars.map((p) => (
             <div
               key={p.num}
-              className="p-10"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
+              className="p-10 bg-white/5 border border-white/10 hover:bg-white/10 transition-colors duration-300 cursor-default"
             >
               <div
                 className="text-[3rem] font-bold leading-none mb-3"

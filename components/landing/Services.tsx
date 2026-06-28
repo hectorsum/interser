@@ -124,6 +124,7 @@ export default function Services() {
                 color: tab === t ? 'white' : '#2d3a28',
                 borderColor: '#2d3a28',
                 fontFamily: 'var(--font-montserrat)',
+                cursor: tab === t ? 'default' : 'pointer',
                 opacity: tab === t ? 1 : 0.5,
               }}
             >
@@ -139,7 +140,7 @@ export default function Services() {
               className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-[0.78rem] font-semibold"
               style={{ background: 'rgba(196,122,58,0.1)', color: '#c47a3a', border: '1px solid rgba(196,122,58,0.25)' }}
             >
-              Todas desde los 13 años
+              Evaluaciones desde los 13 años
             </div>
             <div className="grid grid-cols-3 gap-6 mb-8">
               {evaluaciones.map((s, i) => <ServiceCard key={i} {...s} />)}
