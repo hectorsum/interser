@@ -48,18 +48,10 @@ export default function Footer() {
   ]
 
   return (
-    <footer style={{ background: '#1a1a18', color: 'white', padding: '5rem 4rem 2rem' }}>
+    <footer className="pt-12 pb-8 px-6 md:pt-20 md:pb-8 md:px-16" style={{ background: '#1a1a18', color: 'white' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        {/* Top 3-column grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'max-content 1fr 1fr',
-            gap: '3rem',
-            marginBottom: '4rem',
-            alignItems: 'start',
-          }}
-        >
+        {/* Top grid: 1 col mobile → 3 col desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-[max-content_1fr_1fr] gap-8 md:gap-12 mb-12 md:mb-16 items-start">
           {/* Col 1: Logo */}
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Image
@@ -113,7 +105,7 @@ export default function Footer() {
           </div>
 
           {/* Col 3: Nav links */}
-          <div style={{ justifySelf: 'center' }}>
+          <div className="justify-self-start md:justify-self-center">
             <h3
               style={{
                 fontFamily: 'var(--font-raleway)',
@@ -161,7 +153,7 @@ export default function Footer() {
               margin: 0,
             }}
           >
-            © {new Date().getFullYear()} Interser. Todos los derechos reservados.&nbsp;&nbsp;|&nbsp;&nbsp;Developed by{' '}
+            © {new Date().getUTCFullYear()} Interser. Todos los derechos reservados.&nbsp;&nbsp;|&nbsp;&nbsp;Developed by{' '}
             <Link href="https://hectorsum.vercel.app/" target="_blank" rel="noopener noreferrer" className='text-[#c47a3a]'>
               Hector Herrera
             </Link>
