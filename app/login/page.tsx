@@ -25,12 +25,7 @@ export default function LoginPage() {
         if (authError) throw authError
         router.push('/admin')
       } else {
-        // Fallback demo credentials
-        if (email === 'admin@interser.com' && password === 'interser2025') {
-          router.push('/admin')
-        } else {
-          throw new Error('Correo o contraseña incorrectos.')
-        }
+        throw new Error('Correo o contraseña incorrectos.')
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Correo o contraseña incorrectos.')
@@ -73,11 +68,11 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8 relative">
           <Image
-            src="/assets/logo-main.png"
+            src="/assets/logo-main.svg"
             alt="Interser"
             width={100}
             height={100}
-            style={{ width: '100px', height: 'auto' }}
+            style={{ width: '150px', height: 'auto' }}
             className="object-contain object-left"
             priority
           />

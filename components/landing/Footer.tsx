@@ -155,7 +155,7 @@ export default function Footer() {
           >
             © {new Date().getUTCFullYear()} Interser. Todos los derechos reservados.&nbsp;&nbsp;|&nbsp;&nbsp;Developed by{' '}
             <Link href="https://hectorsum.vercel.app/" target="_blank" rel="noopener noreferrer" className='text-[#c47a3a]'>
-              Hector Herrera
+              Hector
             </Link>
           </p>
           <Link
