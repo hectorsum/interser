@@ -64,17 +64,35 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#f5f3f0', fontFamily: 'var(--font-montserrat)' }}>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-[90] md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className="w-[255px] flex-shrink-0 flex flex-col overflow-y-auto"
-        style={{ background: '#2d3a28', position: 'fixed', height: '100%', zIndex: 100 }}
+        className={`w-[255px] flex-shrink-0 flex flex-col overflow-y-auto fixed h-full z-[100] transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ background: '#2d3a28' }}
       >
         {/* Logo */}
         <div className="px-6 py-7" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <Image src="/assets/logo-main.png" alt="Interser" width={36} height={36} className="h-9 w-auto" />
+          {/* <Image src="/assets/logo-main.png" alt="Interser" width={36} height={36} className="h-9 w-auto" /> */}
+          <Image
+            src="/assets/logo-main.svg"
+            alt="Interser"
+            width={100}
+            height={100}
+            style={{ width: '170px', height: 'auto' }}
+            className="object-contain object-left"
+            priority
+          />
         </div>
 
         {/* Nav */}
@@ -116,7 +134,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto" style={{ marginLeft: '255px' }}>
+      <main className="flex-1 overflow-y-auto md:ml-[255px]">
+        {/* Mobile topbar */}
+        <div className="flex items-center gap-4 px-4 py-3 md:hidden" style={{ background: '#2d3a28' }}>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex flex-col gap-1.5 p-1"
+            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+            aria-label="Abrir menú"
+          >
+            <span className="w-5 h-0.5 block bg-white" />
+            <span className="w-5 h-0.5 block bg-white" />
+            <span className="w-5 h-0.5 block bg-white" />
+          </button>
+          <Image src="/assets/logo-main.png" alt="Interser" width={28} height={28} className="h-7 w-auto" />
+        </div>
         {children}
       </main>
     </div>
