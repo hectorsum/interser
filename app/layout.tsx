@@ -22,6 +22,7 @@ const raleway = Raleway({
 export const metadata: Metadata = {
   title: 'Interser — Construyendo mentes resilientes',
   description: 'Somos un grupo de terapeutas especializados en regulación emocional, ansiedad, depresión y conductas de riesgo.',
+  icons: { icon: '/interser.ico' },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
