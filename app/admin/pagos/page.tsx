@@ -200,7 +200,7 @@ export default function PagosPage() {
         </div>
 
         {/* Period dropdown */}
-        <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
+        <select value={periodFilter} onChange={(e) => setPeriodFilter(e.target.value)} className="w-full sm:w-auto" style={selectStyle}>
           {periodOptions.slice(0, 3).map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
@@ -215,12 +215,12 @@ export default function PagosPage() {
         </select>
 
         {/* Patient dropdown */}
-        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} style={{ ...selectStyle, width: '100%' }} className="sm:w-auto">
+        <select value={patientFilter} onChange={(e) => setPatientFilter(e.target.value)} className="w-full sm:w-auto" style={selectStyle}>
           <option value="all">Todos los pacientes</option>
           {patients.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
 
-        <div className="hidden sm:flex flex-1" />
+        <div className="flex-1" />
 
         <button
           className="w-full sm:w-auto px-6 py-2 text-white text-sm font-bold uppercase tracking-wide transition-opacity hover:opacity-90"

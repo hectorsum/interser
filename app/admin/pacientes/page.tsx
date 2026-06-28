@@ -86,7 +86,7 @@ export default function PacientesPage() {
           placeholder="Buscar nombre o DNI..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="px-4 py-2 text-sm outline-none w-full sm:w-56"
+          className="px-4 py-2 text-sm outline-none w-full sm:w-48"
           style={{
             border: '1px solid #d0c9c2',
             background: 'white',
