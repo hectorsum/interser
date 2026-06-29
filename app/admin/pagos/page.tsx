@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
+import { getPacientes, getPagos, invalidate } from '@/lib/queries'
 
 type PaymentStatus = 'PAGADO' | 'PENDIENTE'
 type Method = 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Yape-Plin'
@@ -18,10 +19,19 @@ interface Payment {
   receipt: boolean
   date: string  // YYYY-MM-DD
 }
+interface Patient {
+  id: number
+  name: string
+  dni: string
+  phone: string
+  email: string
+  service: string
+  status: 'ACTIVO' | 'INACTIVO'
+}
 
 const statusStyle: Record<PaymentStatus, { bg: string; color: string }> = {
-  PAGADO:    { bg: 'rgba(39,174,96,0.12)',  color: '#1a7a45' },
-  PENDIENTE: { bg: 'rgba(230,165,0,0.15)',  color: '#7a5500' },
+  PAGADO: { bg: 'rgba(39,174,96,0.12)', color: '#1a7a45' },
+  PENDIENTE: { bg: 'rgba(230,165,0,0.15)', color: '#7a5500' },
 }
 
 const MONTH_NAMES = [
@@ -43,7 +53,7 @@ function toDateObj(s: string): Date {
   return new Date(y, m - 1, d)
 }
 
-type StatusFilter  = 'Todos' | 'PAGADO' | 'PENDIENTE'
+type StatusFilter = 'Todos' | 'PAGADO' | 'PENDIENTE'
 type ReceiptFilter = 'Todos' | 'con' | 'sin'
 
 type FormState = {
@@ -99,22 +109,22 @@ function mapRow(r: Record<string, unknown>): Payment {
 }
 
 export default function PagosPage() {
-  const [payments,       setPayments]       = useState<Payment[]>([])
+  const [payments, setPayments] = useState<Payment[]>([])
   const [patientOptions, setPatientOptions] = useState<string[]>([])
-  const [loading,        setLoading]        = useState(true)
-  const [saving,         setSaving]         = useState(false)
-  const [statusFilter,   setStatusFilter]   = useState<StatusFilter>('Todos')
-  const [patientFilter,  setPatientFilter]  = useState('all')
-  const [receiptFilter,  setReceiptFilter]  = useState<ReceiptFilter>('Todos')
-  const [periodFilter,   setPeriodFilter]   = useState('current-month')
-  const [showAdd,        setShowAdd]        = useState(false)
-  const [editTarget,     setEditTarget]     = useState<Payment | null>(null)
-  const [deleteTarget,   setDeleteTarget]   = useState<Payment | null>(null)
-  const [form,           setForm]           = useState<FormState>({ ...emptyForm })
-  const [errors,         setErrors]         = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos')
+  const [patientFilter, setPatientFilter] = useState('all')
+  const [receiptFilter, setReceiptFilter] = useState<ReceiptFilter>('Todos')
+  const [periodFilter, setPeriodFilter] = useState('current-month')
+  const [showAdd, setShowAdd] = useState(false)
+  const [editTarget, setEditTarget] = useState<Payment | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Payment | null>(null)
+  const [form, setForm] = useState<FormState>({ ...emptyForm })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const now          = new Date()
-  const currentYear  = now.getUTCFullYear()
+  const now = new Date()
+  const currentYear = now.getUTCFullYear()
   const currentMonth = now.getUTCMonth() + 1
   const currentMonthKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}`
 
@@ -130,11 +140,15 @@ export default function PagosPage() {
 
     // Load data
     Promise.all([
-      supabase?.from('pagos').select('*').order('date', { ascending: false }),
-      supabase?.from('pacientes').select('name').order('name'),
-    ]).then(([pagosRes, pacRes]) => {
-      if (pagosRes?.data) setPayments(pagosRes.data.map(mapRow))
-      if (pacRes?.data)   setPatientOptions(pacRes.data.map((p: { name: string }) => p.name))
+      // supabase?.from('pagos').select('*').order('date', { ascending: false }),
+      // supabase?.from('pacientes').select('name').order('name'),
+      getPagos().then((data) => {
+        setPayments(data.map(mapRow))
+      }),
+      getPacientes().then((data) => {
+        setPatientOptions(data.map((p: Patient) => p.name))
+      }),
+    ]).then(() => {
       setLoading(false)
     })
   }, [])
@@ -156,18 +170,18 @@ export default function PagosPage() {
 
   const filtered = useMemo(() => payments.filter((p) => {
     const monthKey = p.date.slice(0, 7)
-    const yearKey  = p.date.slice(0, 4)
+    const yearKey = p.date.slice(0, 4)
     const matchesPeriod =
       periodFilter === 'current-month' ? monthKey === currentMonthKey :
-      periodFilter.startsWith('year-') ? yearKey  === periodFilter.replace('year-', '') :
-                                         monthKey === periodFilter
+        periodFilter.startsWith('year-') ? yearKey === periodFilter.replace('year-', '') :
+          monthKey === periodFilter
     return matchesPeriod &&
-           (statusFilter  === 'Todos' || p.status === statusFilter) &&
-           (patientFilter === 'all'   || p.patient === patientFilter) &&
-           (receiptFilter === 'Todos' ? true : receiptFilter === 'con' ? p.receipt : !p.receipt)
+      (statusFilter === 'Todos' || p.status === statusFilter) &&
+      (patientFilter === 'all' || p.patient === patientFilter) &&
+      (receiptFilter === 'Todos' ? true : receiptFilter === 'con' ? p.receipt : !p.receipt)
   }), [payments, periodFilter, statusFilter, patientFilter, receiptFilter, currentMonthKey])
 
-  const totalPagado    = filtered.filter((p) => p.status === 'PAGADO').reduce((a, p) => a + p.amount, 0)
+  const totalPagado = filtered.filter((p) => p.status === 'PAGADO').reduce((a, p) => a + p.amount, 0)
   const totalPendiente = filtered.filter((p) => p.status === 'PENDIENTE').reduce((a, p) => a + p.amount, 0)
 
   function openAdd() { setForm({ ...emptyForm, date: new Date() }); setErrors({}); setShowAdd(true) }
@@ -180,7 +194,7 @@ export default function PagosPage() {
   function validate() {
     const e: Record<string, string> = {}
     if (!form.patient) e.patient = 'Requerido'
-    if (!form.date)    e.date    = 'Requerido'
+    if (!form.date) e.date = 'Requerido'
     if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0) e.amount = 'Ingresa un monto válido'
     return e
   }
@@ -200,6 +214,7 @@ export default function PagosPage() {
       await supabase!.from('pagos').update(payload).eq('id', editTarget.id)
       setPayments((prev) => prev.map((p) => p.id === editTarget.id ? { id: editTarget.id, ...payload } : p))
     }
+    invalidate('pagos', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     closeModal()
   }
@@ -209,6 +224,7 @@ export default function PagosPage() {
     setSaving(true)
     await supabase!.from('pagos').delete().eq('id', deleteTarget.id)
     setPayments((prev) => prev.filter((p) => p.id !== deleteTarget.id))
+    invalidate('pagos', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     setDeleteTarget(null)
   }

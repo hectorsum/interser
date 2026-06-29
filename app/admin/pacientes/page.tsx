@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { getPacientes, invalidate } from '@/lib/queries'
 
 interface Patient {
   id: number
@@ -26,8 +27,8 @@ const SERVICES = [
 ]
 
 const statusStyle: Record<string, { bg: string; color: string }> = {
-  ACTIVO:   { bg: 'rgba(39,174,96,0.12)',  color: '#1a7a45' },
-  INACTIVO: { bg: 'rgba(192,57,43,0.10)',  color: '#c0392b' },
+  ACTIVO: { bg: 'rgba(39,174,96,0.12)', color: '#1a7a45' },
+  INACTIVO: { bg: 'rgba(192,57,43,0.10)', color: '#c0392b' },
 }
 
 type Filter = 'Todos' | 'Activos' | 'Inactivos'
@@ -50,27 +51,26 @@ function Backdrop({ onClose }: { onClose: () => void }) {
 }
 
 export default function PacientesPage() {
-  const [patients,     setPatients]     = useState<Patient[]>([])
-  const [loading,      setLoading]      = useState(true)
-  const [saving,       setSaving]       = useState(false)
-  const [filter,       setFilter]       = useState<Filter>('Todos')
-  const [search,       setSearch]       = useState('')
-  const [showAdd,      setShowAdd]      = useState(false)
-  const [editTarget,   setEditTarget]   = useState<Patient | null>(null)
+  const [patients, setPatients] = useState<Patient[]>([])
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [filter, setFilter] = useState<Filter>('Todos')
+  const [search, setSearch] = useState('')
+  const [showAdd, setShowAdd] = useState(false)
+  const [editTarget, setEditTarget] = useState<Patient | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Patient | null>(null)
-  const [form,         setForm]         = useState<FormState>({ ...emptyForm })
-  const [errors,       setErrors]       = useState<Record<string, string>>({})
+  const [form, setForm] = useState<FormState>({ ...emptyForm })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const date = new Date().toLocaleDateString('es-PE', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
   useEffect(() => {
-    supabase?.from('pacientes').select('*').order('name')
-      .then(({ data }) => {
-        if (data) setPatients(data as Patient[])
-        setLoading(false)
-      })
+    getPacientes().then((data) => {
+      setPatients(data as Patient[])
+      setLoading(false)
+    })
   }, [])
 
   const filtered = patients.filter((p) => {
@@ -85,9 +85,9 @@ export default function PacientesPage() {
 
   function validate() {
     const e: Record<string, string> = {}
-    if (!form.name.trim()) e.name    = 'Requerido'
-    if (!form.dni.trim())  e.dni     = 'Requerido'
-    if (!form.service)     e.service = 'Selecciona un servicio'
+    if (!form.name.trim()) e.name = 'Requerido'
+    if (!form.dni.trim()) e.dni = 'Requerido'
+    if (!form.service) e.service = 'Selecciona un servicio'
     return e
   }
 
@@ -103,6 +103,7 @@ export default function PacientesPage() {
       await supabase!.from('pacientes').update(payload).eq('id', editTarget.id)
       setPatients((prev) => prev.map((p) => p.id === editTarget.id ? { ...p, ...payload } : p))
     }
+    invalidate('pacientes', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     closeModal()
   }
@@ -112,6 +113,7 @@ export default function PacientesPage() {
     setSaving(true)
     await supabase!.from('pacientes').delete().eq('id', deleteTarget.id)
     setPatients((prev) => prev.filter((p) => p.id !== deleteTarget.id))
+    invalidate('pacientes', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     setDeleteTarget(null)
   }

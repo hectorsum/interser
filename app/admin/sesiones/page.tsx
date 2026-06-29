@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
+import { getPacientes, getSesiones, invalidate } from '@/lib/queries'
 
 type SessionType = 'TERAPIA' | 'EVALUACIÓN'
 
@@ -15,9 +16,18 @@ interface Session {
   type: SessionType
   notes: string
 }
+interface Patient {
+  id: number
+  name: string
+  dni: string
+  phone: string
+  email: string
+  service: string
+  status: 'ACTIVO' | 'INACTIVO'
+}
 
 const typeStyle: Record<SessionType, { bg: string; color: string }> = {
-  TERAPIA:    { bg: 'rgba(39,174,96,0.12)',  color: '#1a7a45' },
+  TERAPIA: { bg: 'rgba(39,174,96,0.12)', color: '#1a7a45' },
   EVALUACIÓN: { bg: 'rgba(74,112,196,0.12)', color: '#2a4a9a' },
 }
 
@@ -77,20 +87,20 @@ function mapRow(r: Record<string, unknown>): Session {
 }
 
 export default function SesionesPage() {
-  const [sessions,       setSessions]       = useState<Session[]>([])
+  const [sessions, setSessions] = useState<Session[]>([])
   const [patientOptions, setPatientOptions] = useState<string[]>([])
-  const [loading,        setLoading]        = useState(true)
-  const [saving,         setSaving]         = useState(false)
-  const [patientFilter,  setPatientFilter]  = useState('all')
-  const [monthFilter,    setMonthFilter]    = useState('all')
-  const [showAdd,        setShowAdd]        = useState(false)
-  const [editTarget,     setEditTarget]     = useState<Session | null>(null)
-  const [deleteTarget,   setDeleteTarget]   = useState<Session | null>(null)
-  const [form,           setForm]           = useState<FormState>({ ...emptyForm })
-  const [errors,         setErrors]         = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [patientFilter, setPatientFilter] = useState('all')
+  const [monthFilter, setMonthFilter] = useState('all')
+  const [showAdd, setShowAdd] = useState(false)
+  const [editTarget, setEditTarget] = useState<Session | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Session | null>(null)
+  const [form, setForm] = useState<FormState>({ ...emptyForm })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const now          = new Date()
-  const currentYear  = now.getUTCFullYear()
+  const now = new Date()
+  const currentYear = now.getUTCFullYear()
   const currentMonth = now.getUTCMonth() + 1
 
   const date = now.toLocaleDateString('es-PE', {
@@ -99,11 +109,15 @@ export default function SesionesPage() {
 
   useEffect(() => {
     Promise.all([
-      supabase?.from('sesiones').select('*').order('date', { ascending: false }),
-      supabase?.from('pacientes').select('name').eq('status', 'ACTIVO').order('name'),
-    ]).then(([sesRes, pacRes]) => {
-      if (sesRes?.data) setSessions(sesRes.data.map(mapRow))
-      if (pacRes?.data) setPatientOptions(pacRes.data.map((p: { name: string }) => p.name))
+      // supabase?.from('sesiones').select('*').order('date', { ascending: false }),
+      // supabase?.from('pacientes').select('name').eq('status', 'ACTIVO').order('name'),
+      getSesiones().then((data) => {
+        setSessions(data as Session[])
+      }),
+      getPacientes().then((data) => {
+        setPatientOptions(data.map((p: Patient) => p.name))
+      }),
+    ]).then(() => {
       setLoading(false)
     })
   }, [])
@@ -118,7 +132,7 @@ export default function SesionesPage() {
   const filtered = useMemo(() => sessions.filter((s) => {
     const monthKey = s.date.slice(0, 7)
     return (patientFilter === 'all' || s.patient === patientFilter) &&
-           (monthFilter   === 'all' || monthKey  === monthFilter)
+      (monthFilter === 'all' || monthKey === monthFilter)
   }), [sessions, patientFilter, monthFilter])
 
   const grouped = useMemo(() => {
@@ -138,8 +152,8 @@ export default function SesionesPage() {
   function validate() {
     const e: Record<string, string> = {}
     if (!form.patient) e.patient = 'Requerido'
-    if (!form.date)    e.date    = 'Requerido'
-    if (!form.time)    e.time    = 'Requerido'
+    if (!form.date) e.date = 'Requerido'
+    if (!form.time) e.time = 'Requerido'
     return e
   }
 
@@ -155,6 +169,7 @@ export default function SesionesPage() {
       await supabase!.from('sesiones').update(payload).eq('id', editTarget.id)
       setSessions((prev) => prev.map((s) => s.id === editTarget.id ? { ...s, ...payload } : s))
     }
+    invalidate('sesiones', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     closeModal()
   }
@@ -164,6 +179,7 @@ export default function SesionesPage() {
     setSaving(true)
     await supabase!.from('sesiones').delete().eq('id', deleteTarget.id)
     setSessions((prev) => prev.filter((s) => s.id !== deleteTarget.id))
+    invalidate('sesiones', `dashboard-${new Date().getFullYear()}-${new Date().getMonth() + 1}`)
     setSaving(false)
     setDeleteTarget(null)
   }
