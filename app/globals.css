@@ -35,6 +35,11 @@ body {
   overflow-x: hidden;
 }
 
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+}
+
 @keyframes progress {
   from {
     width: 0%

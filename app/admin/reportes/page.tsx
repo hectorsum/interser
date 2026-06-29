@@ -111,7 +111,7 @@ export default function ReportesPage() {
             ))}
           </select>
           <button
-            onClick={() => window.print()}
+            onClick={() => window.open(`/admin/reportes/mensual?month=${selectedMonth}`, '_blank')}
             className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-white uppercase tracking-wide transition-opacity hover:opacity-90"
             style={{ background: '#c47a3a', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-montserrat)' }}
           >
@@ -144,7 +144,7 @@ export default function ReportesPage() {
             ))}
           </select>
           <button
-            onClick={() => window.print()}
+            onClick={() => window.open(`/admin/reportes/anual?year=${selectedYear}`, '_blank')}
             className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-white uppercase tracking-wide transition-opacity hover:opacity-90"
             style={{ background: '#2d3a28', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-montserrat)' }}
           >
