@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -65,9 +65,13 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [pendingHref, setPendingHref] = useState<string | null>(null)
+
+  // Limpia el pending cuando la navegación termina
+  useEffect(() => { setPendingHref(null) }, [pathname])
 
   return (
-    <>
+    <div className="print:hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -97,12 +101,12 @@ export default function AdminSidebar() {
         {/* Nav */}
         <nav className="flex-1 py-4">
           {navItems.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = (pendingHref ?? pathname) === item.href
             return (
               <Link
                 key={item.id}
                 href={item.href}
-                onClick={() => setSidebarOpen(false)}
+                onClick={() => { setPendingHref(item.href); setSidebarOpen(false) }}
                 className="flex items-center gap-3 px-6 py-[0.85rem] text-sm font-medium transition-all duration-200"
                 style={{
                   color: isActive ? '#c47a3a' : 'rgba(255,255,255,0.55)',
@@ -157,6 +161,6 @@ export default function AdminSidebar() {
           priority
         />
       </div>
-    </>
+    </div>
   )
 }
