@@ -122,7 +122,7 @@ export default function PacientesPage() {
   const isModalOpen = showAdd || !!editTarget || !!deleteTarget
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-8 py-8 pt-20 md:pt-8">
 
       {/* Add / Edit modal */}
       {(showAdd || !!editTarget) && (

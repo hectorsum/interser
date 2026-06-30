@@ -73,7 +73,7 @@ export default function ReportesPage() {
   }
 
   return (
-    <div className="px-8 py-8">
+    <div className="px-8 py-8 pt-20 md:pt-8">
       {/* Header */}
       <div className="flex justify-between items-start mb-8 pb-5" style={{ borderBottom: '1px solid #e0d9d3' }}>
         <h1 className="text-[1.75rem] font-semibold" style={{ fontFamily: 'var(--font-raleway)', color: '#2d3a28' }}>
