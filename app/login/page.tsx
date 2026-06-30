@@ -19,18 +19,29 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setLoading(true)
 
+    const cleanEmail = email.trim().toLowerCase().slice(0, 254)
+    const cleanPassword = password.slice(0, 128)
+
+    if (!cleanEmail || !cleanPassword) {
+      setError('Correo o contraseña incorrectos.')
+      return
+    }
+
+    setLoading(true)
     try {
       if (isSupabaseConfigured && supabase) {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password: cleanPassword,
+        })
         if (authError) throw authError
         router.push('/admin')
       } else {
         throw new Error('Correo o contraseña incorrectos.')
       }
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Correo o contraseña incorrectos.')
+    } catch {
+      setError('Correo o contraseña incorrectos.')
     } finally {
       setLoading(false)
     }
