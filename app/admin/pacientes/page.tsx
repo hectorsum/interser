@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getPacientes, getCached, invalidate } from '@/lib/queries'
+import { sanitizeForm } from '@/lib/sanitize'
 
 interface Patient {
   id: number
@@ -95,7 +96,7 @@ export default function PacientesPage() {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
     setSaving(true)
-    const payload = { name: form.name, dni: form.dni, phone: form.phone, email: form.email, service: form.service, status: form.status }
+    const payload = sanitizeForm({ name: form.name, dni: form.dni, phone: form.phone, email: form.email, service: form.service, status: form.status })
     if (showAdd) {
       const { data } = await supabase!.from('pacientes').insert([payload]).select().single()
       if (data) setPatients((prev) => [...prev, data as Patient])

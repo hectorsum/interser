@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
 import { getPacientes, getPagos, getCached, getPacienteNames, invalidate } from '@/lib/queries'
+import { sanitizeForm } from '@/lib/sanitize'
 
 type PaymentStatus = 'PAGADO' | 'PENDIENTE'
 type Method = 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Yape-Plin'
@@ -203,10 +204,10 @@ export default function PagosPage() {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
     setSaving(true)
-    const payload = {
+    const payload = sanitizeForm({
       patient: form.patient, concept: form.concept, date: fromDateObj(form.date!),
       amount: Number(form.amount), method: form.method, status: form.status, receipt: form.receipt,
-    }
+    })
     if (showAdd) {
       const { data } = await supabase!.from('pagos').insert([payload]).select().single()
       if (data) setPayments((prev) => [mapRow(data), ...prev])

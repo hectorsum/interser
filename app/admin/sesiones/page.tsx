@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
 import { getPacientes, getSesiones, getCached, getPacienteNames, invalidate } from '@/lib/queries'
+import { sanitizeForm } from '@/lib/sanitize'
 
 type SessionType = 'TERAPIA' | 'EVALUACIÓN'
 
@@ -161,7 +162,7 @@ export default function SesionesPage() {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
     setSaving(true)
-    const payload = { patient: form.patient, date: fromDateObj(form.date!), time: form.time, type: form.type, notes: form.notes }
+    const payload = sanitizeForm({ patient: form.patient, date: fromDateObj(form.date!), time: form.time, type: form.type, notes: form.notes })
     if (showAdd) {
       const { data } = await supabase!.from('sesiones').insert([payload]).select().single()
       if (data) setSessions((prev) => [mapRow(data), ...prev])
