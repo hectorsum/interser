@@ -15,6 +15,17 @@ export function invalidate(...keys: string[]) {
   keys.forEach((k) => delete cache[k])
 }
 
+export function getCached<T>(key: string): T | null {
+  const hit = cache[key]
+  if (hit && Date.now() - hit.ts < TTL) return hit.data as T
+  return null
+}
+
+export function getPacienteNames(): string[] | null {
+  const pacientes = getCached<{ name: string }[]>('pacientes')
+  return pacientes ? pacientes.map((p) => p.name) : null
+}
+
 export function getPacientes() {
   return cached('pacientes', async () => {
     const sb = createCachedClient()

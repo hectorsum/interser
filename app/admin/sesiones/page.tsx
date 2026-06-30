@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
-import { getPacientes, getSesiones, invalidate } from '@/lib/queries'
+import { getPacientes, getSesiones, getCached, getPacienteNames, invalidate } from '@/lib/queries'
 
 type SessionType = 'TERAPIA' | 'EVALUACIÓN'
 
@@ -87,9 +87,9 @@ function mapRow(r: Record<string, unknown>): Session {
 }
 
 export default function SesionesPage() {
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [patientOptions, setPatientOptions] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
+  const [sessions, setSessions] = useState<Session[]>(() => getCached<Session[]>('sesiones') ?? [])
+  const [patientOptions, setPatientOptions] = useState<string[]>(() => getPacienteNames() ?? [])
+  const [loading, setLoading] = useState(() => getCached('sesiones') === null)
   const [saving, setSaving] = useState(false)
   const [patientFilter, setPatientFilter] = useState('all')
   const [monthFilter, setMonthFilter] = useState('all')

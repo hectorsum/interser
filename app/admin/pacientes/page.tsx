@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getPacientes, invalidate } from '@/lib/queries'
+import { getPacientes, getCached, invalidate } from '@/lib/queries'
 
 interface Patient {
   id: number
@@ -51,8 +51,8 @@ function Backdrop({ onClose }: { onClose: () => void }) {
 }
 
 export default function PacientesPage() {
-  const [patients, setPatients] = useState<Patient[]>([])
-  const [loading, setLoading] = useState(true)
+  const [patients, setPatients] = useState<Patient[]>(() => getCached<Patient[]>('pacientes') ?? [])
+  const [loading, setLoading] = useState(() => getCached('pacientes') === null)
   const [saving, setSaving] = useState(false)
   const [filter, setFilter] = useState<Filter>('Todos')
   const [search, setSearch] = useState('')

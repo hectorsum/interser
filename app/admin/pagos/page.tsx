@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { supabase } from '@/lib/supabase'
-import { getPacientes, getPagos, invalidate } from '@/lib/queries'
+import { getPacientes, getPagos, getCached, getPacienteNames, invalidate } from '@/lib/queries'
 
 type PaymentStatus = 'PAGADO' | 'PENDIENTE'
 type Method = 'Efectivo' | 'Transferencia' | 'Tarjeta' | 'Yape-Plin'
@@ -109,9 +109,9 @@ function mapRow(r: Record<string, unknown>): Payment {
 }
 
 export default function PagosPage() {
-  const [payments, setPayments] = useState<Payment[]>([])
-  const [patientOptions, setPatientOptions] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
+  const [payments, setPayments] = useState<Payment[]>(() => getCached<Payment[]>('pagos') ?? [])
+  const [patientOptions, setPatientOptions] = useState<string[]>(() => getPacienteNames() ?? [])
+  const [loading, setLoading] = useState(() => getCached('pagos') === null)
   const [saving, setSaving] = useState(false)
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos')
   const [patientFilter, setPatientFilter] = useState('all')
