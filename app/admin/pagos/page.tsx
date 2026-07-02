@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { getPacientes, getPagos, getCached, getPacienteNames, invalidate } from '@/lib/queries'
 import { sanitizeForm } from '@/lib/sanitize'
 
