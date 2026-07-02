@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getDashboardData } from '@/lib/queries'
+import { createClient } from '@/lib/supabase/server'
 import DashboardCharts from './DashboardCharts'
 
 const MONTH_NAMES_SHORT = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -13,8 +14,9 @@ export default async function AdminDashboard() {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
+  const supabase = await createClient()
   const { activePatients, noReceipt, monthIncome, yearIncome, incomeByMonth, countByMonth } =
-    await getDashboardData(currentYear, currentMonth)
+    await getDashboardData(currentYear, currentMonth, supabase)
 
   const monthlyIncome = MONTH_NAMES_SHORT.map((mes, i) => ({ mes, value: incomeByMonth[i] }))
   const monthlySessions = MONTH_NAMES_SHORT.map((mes, i) => ({ mes, value: countByMonth[i] }))

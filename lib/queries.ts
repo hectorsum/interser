@@ -50,9 +50,9 @@ export function getPagos() {
   })
 }
 
-export function getDashboardData(year: number, month: number) {
+export function getDashboardData(year: number, month: number, client?: ReturnType<typeof createCachedClient>) {
   return cached(`dashboard-${year}-${month}`, async () => {
-    const sb = createCachedClient()
+    const sb = client ?? createCachedClient()
     const mm         = String(month).padStart(2, '0')
     const yearStart  = `${year}-01-01`
     const yearEnd    = `${year}-12-31`
